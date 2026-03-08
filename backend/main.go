@@ -43,9 +43,19 @@ func main() {
 
 	// CORS middleware
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"https://rocode-production.up.railway.app/api/register", "https://rocode-rose.vercel.app/", "http://localhost:3000", "http://localhost:5173"}
+	// Allow specific origins (no paths). Include your Vercel frontend and localhost dev origins.
+	config.AllowOrigins = []string{
+		"https://rocode-production.up.railway.app",
+		"https://rocode-rose.vercel.app",
+		"http://localhost:3000",
+		"http://localhost:5173",
+	}
+	// Allow common HTTP methods including OPTIONS for preflight
+	config.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"}
 	config.AllowCredentials = true
-	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
+	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization", "X-Requested-With"}
+	// Optionally expose Authorization header to the browser
+	config.ExposeHeaders = []string{"Authorization"}
 	r.Use(cors.New(config))
 
 	// Routes
