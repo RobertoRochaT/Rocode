@@ -1,29 +1,36 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { UserPlus, Mail, Lock, User, AlertCircle, CheckCircle } from 'lucide-react';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import {
+  UserPlus,
+  Mail,
+  Lock,
+  User,
+  AlertCircle,
+  CheckCircle,
+} from "lucide-react";
 
 const Register = () => {
-  const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
 
   const validateForm = () => {
     if (password.length < 6) {
-      setError('Password must be at least 6 characters long');
+      setError("Password must be at least 6 characters long");
       return false;
     }
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       return false;
     }
     if (username.length < 3) {
-      setError('Username must be at least 3 characters long');
+      setError("Username must be at least 3 characters long");
       return false;
     }
     return true;
@@ -31,7 +38,7 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (!validateForm()) {
       return;
@@ -39,22 +46,41 @@ const Register = () => {
 
     setLoading(true);
 
-    const result = await register(email, username, password);
+    try {
+      const result = await register(email, username, password);
 
-    if (result.success) {
-      navigate('/roadmap');
-    } else {
-      setError(result.error);
+      if (result && result.success) {
+        navigate("/roadmap");
+      } else {
+        // Normalize error into a string so the UI doesn't crash when an object is returned
+        const err = result?.error;
+        const message =
+          typeof err === "string"
+            ? err
+            : err?.message ||
+              (err ? JSON.stringify(err) : "Registration failed");
+        setError(message);
+      }
+    } catch (err) {
+      // Catch unexpected exceptions (network errors, thrown errors, etc.)
+      const message =
+        err?.response?.data?.error ||
+        err?.message ||
+        (typeof err === "object" ? JSON.stringify(err) : String(err)) ||
+        "Registration failed";
+      setError(message);
+    } finally {
+      // Ensure loading state is always cleared
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   const passwordStrength = () => {
-    if (password.length === 0) return { text: '', color: '' };
-    if (password.length < 6) return { text: 'Weak', color: 'text-red-400' };
-    if (password.length < 10) return { text: 'Medium', color: 'text-yellow-400' };
-    return { text: 'Strong', color: 'text-green-400' };
+    if (password.length === 0) return { text: "", color: "" };
+    if (password.length < 6) return { text: "Weak", color: "text-red-400" };
+    if (password.length < 10)
+      return { text: "Medium", color: "text-yellow-400" };
+    return { text: "Strong", color: "text-green-400" };
   };
 
   const strength = passwordStrength();
@@ -67,7 +93,9 @@ const Register = () => {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-600 rounded-2xl mb-4">
             <UserPlus className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gradient mb-2">Create Account</h1>
+          <h1 className="text-3xl font-bold text-gradient mb-2">
+            Create Account
+          </h1>
           <p className="text-dark-400">Start your coding journey today</p>
         </div>
 
@@ -84,7 +112,10 @@ const Register = () => {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-dark-300 mb-2">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-dark-300 mb-2"
+              >
                 Email
               </label>
               <div className="relative">
@@ -106,7 +137,10 @@ const Register = () => {
 
             {/* Username Field */}
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-dark-300 mb-2">
+              <label
+                htmlFor="username"
+                className="block text-sm font-medium text-dark-300 mb-2"
+              >
                 Username
               </label>
               <div className="relative">
@@ -125,12 +159,17 @@ const Register = () => {
                   disabled={loading}
                 />
               </div>
-              <p className="text-xs text-dark-500 mt-1">At least 3 characters</p>
+              <p className="text-xs text-dark-500 mt-1">
+                At least 3 characters
+              </p>
             </div>
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-dark-300 mb-2">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-dark-300 mb-2"
+              >
                 Password
               </label>
               <div className="relative">
@@ -152,14 +191,19 @@ const Register = () => {
               {password && (
                 <div className="flex items-center justify-between mt-1">
                   <p className="text-xs text-dark-500">At least 6 characters</p>
-                  <p className={`text-xs font-medium ${strength.color}`}>{strength.text}</p>
+                  <p className={`text-xs font-medium ${strength.color}`}>
+                    {strength.text}
+                  </p>
                 </div>
               )}
             </div>
 
             {/* Confirm Password Field */}
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-dark-300 mb-2">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium text-dark-300 mb-2"
+              >
                 Confirm Password
               </label>
               <div className="relative">
@@ -212,8 +256,11 @@ const Register = () => {
         {/* Sign In Link */}
         <div className="text-center mt-6">
           <p className="text-dark-400">
-            Already have an account?{' '}
-            <Link to="/login" className="text-primary-400 hover:text-primary-300 font-medium">
+            Already have an account?{" "}
+            <Link
+              to="/login"
+              className="text-primary-400 hover:text-primary-300 font-medium"
+            >
               Sign in
             </Link>
           </p>
