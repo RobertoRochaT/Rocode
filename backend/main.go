@@ -43,7 +43,7 @@ func main() {
 
 	// CORS middleware
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"https://rocode-rose.vercel.app/", "http://localhost:3000", "http://localhost:5173"}
+	config.AllowOrigins = []string{"https://rocode-production.up.railway.app/api/register", "https://rocode-rose.vercel.app/", "http://localhost:3000", "http://localhost:5173"}
 	config.AllowCredentials = true
 	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
 	r.Use(cors.New(config))
